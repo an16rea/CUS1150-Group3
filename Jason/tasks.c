@@ -6,9 +6,8 @@ void timeStamp(char timeStamp[]) {
     time_t now;             
     struct tm *current;      
 
-    // get current time and convert to readable format
     now = time(NULL);        
-    current = localtime(&now); 
+    current = localtime(&now); //convert to readable format
 
     // store formatted date + time in a string
     strftime(timeStamp, 50, "%B %d, %Y %H:%M:%S", current);
@@ -20,7 +19,7 @@ void dateAdded(char dateAdded[]) {
     struct tm *current;      
 
     now = time(NULL);        
-    current = localtime(&now); //conver to readable format
+    current = localtime(&now); 
 
     // store only the date in format MM-DD-YYYY
     strftime(dateAdded, 50, "%m-%d-%Y", current);
