@@ -15,7 +15,7 @@ int add_task(TodoItem *task){
     char task_input[100]; 
     char temp_id[100];
     char temp_status[100];
-    snprintf(task_input, sizeof(task_input), "%d | %s | %s\n", task->id, task->name, task->completed ? "Completed" : "Incomplete");
+    snprintf(task_input, sizeof(task_input), "%d | %s | %d | %s\n", task->id, task->name, task->priority,task->completed ? "Completed" : "Incomplete");
     printf("%s",task_input);
 
     FILE *database = fopen("database.txt", "a");  // "a" = append, won't overwrite

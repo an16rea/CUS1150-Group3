@@ -1,9 +1,19 @@
 #include <stdbool.h>
 
+typedef enum {
+
+    LOW,
+    MEDIUM,
+    HIGH
+
+} Priority;
+
 typedef struct {
     int id;
     char name[30];
     bool completed;
+    char timestamp[20];
+    Priority priority; 
 
 } TodoItem; 
 
