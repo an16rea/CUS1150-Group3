@@ -54,11 +54,13 @@ char line[200];
 char temp_completed[15];
 int priority_temp;
 while (fgets(line, sizeof(line), file) != NULL && todo_count < MAX) {
-    sscanf(line, "%d | %[^|]| %d | %s", 
+    sscanf(line, "%d | %[^|]| %d | %s | %s", 
         &todo_list[todo_count].id,
         todo_list[todo_count].name,
         &priority_temp,
-        temp_completed);
+        temp_completed,
+        todo_list[todo_count].timestamp
+    );
     todo_list[todo_count].completed = strcmp( temp_completed,"Incomplete");
     todo_list[todo_count].priority = priority_temp;
     todo_count++;
