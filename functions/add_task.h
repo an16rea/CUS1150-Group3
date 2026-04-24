@@ -13,6 +13,7 @@ typedef struct {
     char name[30];
     bool completed;
     char timestamp[20];
+    char deadline[20];
     Priority priority; 
 
 } TodoItem; 

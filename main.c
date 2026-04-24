@@ -54,12 +54,13 @@ char line[200];
 char temp_completed[15];
 int priority_temp;
 while (fgets(line, sizeof(line), file) != NULL && todo_count < MAX) {
-    sscanf(line, "%d | %[^|]| %d | %s | %s", 
+    sscanf(line, "%d | %[^|]| %d | %s | %s | %s", 
         &todo_list[todo_count].id,
         todo_list[todo_count].name,
         &priority_temp,
         temp_completed,
-        todo_list[todo_count].timestamp
+        todo_list[todo_count].timestamp,
+        todo_list[todo_count].deadline
     );
     todo_list[todo_count].completed = strcmp( temp_completed,"Incomplete");
     todo_list[todo_count].priority = priority_temp;
@@ -136,7 +137,7 @@ void createTask() {
     return;
   }
   int priority_input;
-  printf("Enter new task: ");
+  printf("Enter new task: \n");
   getchar(); // this clears new line
   fgets(todo_list[todo_count].name,100,stdin);
   todo_list[todo_count].name[strcspn(todo_list[todo_count].name, "\n")] = 0;
@@ -149,6 +150,15 @@ void createTask() {
   scanf("%d", &priority_input);
 
   todo_list[todo_count].priority = (Priority) priority_input;
+
+  printf("Enter deadline(Format: mm-dd-yyyy):\n");
+  getchar(); // this clears new line
+  fgets(todo_list[todo_count].deadline,100,stdin);
+  todo_list[todo_count].deadline[strcspn(todo_list[todo_count].deadline, "\n")] = 0;
+
+
+
+
     char dateAdded[20];
     time_t now;              
     struct tm *current;      
@@ -247,12 +257,14 @@ void displayTask() {
 
       for(int i = 0; i < todo_count; i++) {
     if(strcmp(todo_list[i].name, "") !=0) {
-      printf("%d: %s | %s | [%s] | %s\n",
+      printf("%d: %s | %s | [%s] | %s | %s\n",
         i,
         todo_list[i].name,
         priority_to_string(todo_list[i].priority),
         todo_list[i].completed ? "Completed" : "Needs to be done",
-        todo_list[i].timestamp);
+        todo_list[i].timestamp,
+        todo_list[i].deadline
+    );
         
         }
       }
