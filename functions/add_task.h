@@ -8,6 +8,17 @@ typedef enum {
 
 } Priority;
 
+typedef enum {
+
+    SCHOOL,
+    WORK,
+    LIFE,
+    GENERAL
+
+} Categories;
+
+
+
 typedef struct {
     int id;
     char name[30];
@@ -15,6 +26,7 @@ typedef struct {
     char timestamp[20];
     char deadline[20];
     Priority priority; 
+    Categories categories;
 
 } TodoItem; 
 

@@ -53,17 +53,20 @@ FILE *file = fopen("database.txt", "r");
 char line[200];
 char temp_completed[15];
 int priority_temp;
+int category_temp;
 while (fgets(line, sizeof(line), file) != NULL && todo_count < MAX) {
-    sscanf(line, "%d | %[^|]| %d | %s | %s | %s", 
+    sscanf(line, "%d | %[^|]| %d | %d | %s | %s | %s", 
         &todo_list[todo_count].id,
         todo_list[todo_count].name,
         &priority_temp,
+        &category_temp,
         temp_completed,
         todo_list[todo_count].timestamp,
         todo_list[todo_count].deadline
     );
     todo_list[todo_count].completed = strcmp( temp_completed,"Incomplete");
     todo_list[todo_count].priority = priority_temp;
+    todo_list[todo_count].categories = category_temp;
     todo_count++;
     todo_capacity++;
     next_id++;
@@ -102,33 +105,22 @@ char *priority_to_string(Priority priority){
 
 
 }
+char *category_to_string(Categories category){
 
-// char dateAdded() {
-//     time_t now;              
-//     struct tm *current;      
+    switch(category){
 
-//     now = time(NULL);        
-//     current = localtime(&now); 
+        case(SCHOOL): return "School";
+        case(WORK): return "Work";
+        case(LIFE): return "Life";
+        case(GENERAL): return "General";
+        default: return "Unknown";
+    }
 
-//     // store only the date in format MM-DD-YYYY
-//     strftime(dateAdded, 50, "%m-%d-%Y", current);
-//     return dateAdded;
-// }
+
+}
 
 // Function to set task priority level
-void taskPriority(int *priority) {
-    int p;
 
-    printf("Enter priority (1 = Low, 2 = Medium, 3 = High): ");
-    scanf("%d", &p);
-
-    if (p < 1 || p > 3) {
-        printf("Invalid input. Setting priority to Low by default.\n");
-        *priority = 1;
-    } else {
-        *priority = p;
-    }
-}
 
 //Create Task (user input)
 void createTask() {
@@ -136,7 +128,22 @@ void createTask() {
     printf("Task list is full.\n");
     return;
   }
+
   int priority_input;
+  int category_input;
+
+  printf("Enter category:\n");
+  printf("0: School:\n");
+  printf("1: Work:\n");
+  printf("2: Life:\n");
+  printf("3: General:\n");
+
+  scanf("%d", &category_input);
+
+  todo_list[todo_count].categories = (Categories) category_input;
+
+
+
   printf("Enter new task: \n");
   getchar(); // this clears new line
   fgets(todo_list[todo_count].name,100,stdin);
@@ -257,10 +264,11 @@ void displayTask() {
 
       for(int i = 0; i < todo_count; i++) {
     if(strcmp(todo_list[i].name, "") !=0) {
-      printf("%d: %s | %s | [%s] | %s | %s\n",
+      printf("%d: %s | %s | %s | [%s] | %s | %s\n",
         i,
         todo_list[i].name,
         priority_to_string(todo_list[i].priority),
+        category_to_string(todo_list[i].categories),
         todo_list[i].completed ? "Completed" : "Needs to be done",
         todo_list[i].timestamp,
         todo_list[i].deadline
@@ -269,12 +277,70 @@ void displayTask() {
         }
       }
 }
+int customComparator(const void* a, const void* b) {
+    TodoItem *item_a = (TodoItem *)a;
+    TodoItem *item_b = (TodoItem *)b;
+    
+    int tempa_mm;
+    int tempa_dd;
+    int tempa_yyyy;
 
+    int tempb_mm;
+    int tempb_dd;
+    int tempb_yyyy;
+
+
+    sscanf(item_a->deadline, "%d-%d-%d", &tempa_mm,&tempa_dd,&tempa_yyyy);
+    sscanf(item_b->deadline, "%d-%d-%d", &tempb_mm,&tempb_dd,&tempb_yyyy);
+
+ if (tempa_yyyy != tempb_yyyy){
+        return (tempa_yyyy - tempb_yyyy); 
+    } 
+ if (tempa_mm != tempb_mm){
+        return (tempa_mm - tempb_mm) ;
+     
+    }
+         return (tempa_dd  - tempb_dd  );
+
+}
+
+void compareDates(){
+    TodoItem* copytodolist = NULL;
+    copytodolist = (TodoItem*)malloc(sizeof(TodoItem) * todo_capacity);
+    
+    for(int i = 0; i < todo_count; i++){
+        copytodolist[i] = todo_list[i]; 
+    }
+
+    qsort(copytodolist,todo_count,sizeof(todo_list[0]),customComparator);
+
+      for(int i = 0; i < todo_count; i++) {
+    if(strcmp(copytodolist[i].name, "") !=0) {
+      printf("%d: %s | %s | [%s] | %s | %s\n",
+        i,
+        copytodolist[i].name,
+        priority_to_string(copytodolist[i].priority),
+        copytodolist[i].completed ? "Completed" : "Needs to be done",
+        copytodolist[i].timestamp,
+        copytodolist[i].deadline
+    );
+        
+        }
+      }
+ printf("Latest task: %d: %s | %s | [%s] | %s | %s\n",
+        1,
+        copytodolist[todo_count - 1].name,
+        priority_to_string(copytodolist[todo_count - 1].priority),
+        copytodolist[todo_count - 1].completed ? "Completed" : "Needs to be done",
+        copytodolist[todo_count - 1].timestamp,
+        copytodolist[todo_count - 1].deadline
+    );
+}
 int main() {
   int choice;
   initialize_todo_list();
   while (1) {
-    printf("\n1. Add Task\n2. Remove Task\n3. Update Task\n4. Mark Complete\n5. Show Tasks\n6. Exit\n");
+    printf("\n1. Add Task\n2. Remove Task\n3. Update Task\n4. Mark Complete\n5. Show Tasks\n6. compare\n7. exit\n");
     printf("Choose an option: ");
      if (scanf("%d", &choice) != 1){
 
@@ -291,7 +357,8 @@ int main() {
       case 3: updateTask(); break;
       case 4: markComplete(); break;
       case 5: displayTask(); break;
-      case 6: printf("Goodbye!\n"); return 0;
+      case 6: compareDates(); break;
+      case 7: printf("Goodbye!\n"); return 0;
       default: printf("Invalid choice.\n");
     }
   }
