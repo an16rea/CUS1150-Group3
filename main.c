@@ -274,6 +274,37 @@ void displayTask() {
   printf("\n---TO DO LIST --\n");
 
     autoSetHighPriority();
+    
+
+time_t now = time(NULL); //get today's date
+  struct tm * current = localtime(&now); //convert time to readable format
+  
+  int today_month = current->tm_mon + 1;
+  int today_day = current->tm_mday;
+  
+  for (int i = 0; i < todo_count; i++){
+    if (todo_list[i].completed) {
+      continue; // skip the completed task
+    }
+    int d_month, d_day, d_year;
+    
+   sscanf(todo_list[i].deadline, "%d-%d-%d", &d_month, &d_day, &d_year); 
+    if(d_month == today_month && d_day == today_day + 1 && (todo_list[i].priority = HIGH)) {
+      
+      
+ printf("High priority Task: %s | %s | %s | [%s] | %s | %s\n",
+        todo_list[i].name,
+        priority_to_string(todo_list[i].priority),
+        category_to_string(todo_list[i].categories),
+        todo_list[i].completed ? "Completed" : "Needs to be done",
+        todo_list[i].timestamp,
+        todo_list[i].deadline
+    );
+    }
+  }
+
+
+
       for(int i = 0; i < todo_count; i++) {
     if(strcmp(todo_list[i].name, "") !=0) {
       printf("%d: %s | %s | %s | [%s] | %s | %s\n",
@@ -326,20 +357,7 @@ void compareDates(){
 
     qsort(copytodolist,todo_count,sizeof(todo_list[0]),customComparator);
 
-      for(int i = 0; i < todo_count; i++) {
-    if(strcmp(copytodolist[i].name, "") !=0) {
-      printf("%d: %s | %s | [%s] | %s | %s\n",
-        i,
-        copytodolist[i].name,
-        priority_to_string(copytodolist[i].priority),
-        copytodolist[i].completed ? "Completed" : "Needs to be done",
-        copytodolist[i].timestamp,
-        copytodolist[i].deadline
-    );
-        
-        }
-      }
- printf("Latest task: %d: %s | %s | [%s] | %s | %s\n",
+ printf("Next task due: %d: %s | %s | [%s] | %s | %s\n",
         1,
         copytodolist[todo_count - 1].name,
         priority_to_string(copytodolist[todo_count - 1].priority),
@@ -352,7 +370,7 @@ int main() {
   int choice;
   initialize_todo_list();
   while (1) {
-    printf("\n1. Add Task\n2. Remove Task\n3. Update Task\n4. Mark Complete\n5. Show Tasks\n6. compare\n7. exit\n");
+    printf("\n1. Add Task\n2. Remove Task\n3. Update Task\n4. Mark Complete\n5. Show Tasks\n6. Next Task Due\n7. exit\n");
     printf("Choose an option: ");
      if (scanf("%d", &choice) != 1){
 
