@@ -39,7 +39,29 @@ int todo_count = 0;
 int todo_capacity = 0; 
 int next_id = 1;
 
-
+//Auto Set High Priority
+void autoSetHighPriority() {
+  time_t now = time(NULL); //get today's date
+  struct tm * current = localtime(&now); //convert time to readable format
+  
+  int today_month = current->tm_mon + 1;
+  int today_day = current->tm_mday;
+  
+  for (int i = 0; i < todo_count; i++){
+    if (todo_list[i].completed) {
+      continue; // skip the completed task
+    }
+    int d_month, d_day, d_year;
+    
+   sscanf(todo_list[i].deadline, "%d-%d-%d", &d_month, &d_day, &d_year); 
+    if(d_month == today_month && d_day == today_day + 1) {
+      todo_list[i].priority = HIGH;
+      
+      printf("Task \"%s\" is now HIGH priority (DUE TOMORROW)\n", 
+      todo_list[i].name);
+    }
+  }
+}
 
 void initialize_todo_list(){
     todo_capacity = 10;
@@ -250,18 +272,8 @@ void markComplete() {
 //display task
 void displayTask() {
   printf("\n---TO DO LIST --\n");
-  
-//   for(int i = 0; i < count; i++) {
-//     if(strcmp(tasks[i], "") !=0) {
-//       printf("%d: %s [%s]\n",
-//         i,
-//         tasks[i],
-//         completed[i] ? "Completed" : "Needs to be done");
-        
-//         }
-//       }
 
-
+    autoSetHighPriority();
       for(int i = 0; i < todo_count; i++) {
     if(strcmp(todo_list[i].name, "") !=0) {
       printf("%d: %s | %s | %s | [%s] | %s | %s\n",
