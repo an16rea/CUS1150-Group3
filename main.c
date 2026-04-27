@@ -63,6 +63,37 @@ void autoSetHighPriority() {
   }
 }
 
+int isValidDeadline(char *date) {
+    int mm, dd, yyyy;
+    
+    // check format parses correctly
+    if (sscanf(date, "%d-%d-%d", &mm, &dd, &yyyy) != 3) {
+        return 0;  // wrong format
+    }
+    
+    // check ranges make sense
+    if (mm < 1 || mm > 12) return 0;
+    if (dd < 1 || dd > 31) return 0;
+    if (yyyy < 2024)       return 0;
+    
+    // check it's in the future
+    time_t now = time(NULL);
+    struct tm *current = localtime(&now);
+    
+    struct tm input = {0};
+    input.tm_mon  = mm - 1;    // 0-11
+    input.tm_mday = dd;
+    input.tm_year = yyyy - 1900; // years since 1900
+    
+    time_t deadline = mktime(&input);
+    
+    if (difftime(deadline, now) <= 0) {
+        return 0;  // date is in the past
+    }
+    
+    return 1;  // valid
+}
+
 void initialize_todo_list(){
     todo_capacity = 10;
     todo_list = (TodoItem*)malloc(sizeof(TodoItem) * todo_capacity);
@@ -154,14 +185,19 @@ void createTask() {
   int priority_input;
   int category_input;
 
+    while (true) {
   printf("Enter category:\n");
   printf("0: School:\n");
   printf("1: Work:\n");
   printf("2: Life:\n");
   printf("3: General:\n");
-
   scanf("%d", &category_input);
 
+    if (category_input >= 0 && category_input <= 3) {
+        break;
+    }
+    printf("Invalid category. Enter 0, 1, 2, or 3.\n");
+    }
   todo_list[todo_count].categories = (Categories) category_input;
 
 
@@ -170,20 +206,40 @@ void createTask() {
   getchar(); // this clears new line
   fgets(todo_list[todo_count].name,100,stdin);
   todo_list[todo_count].name[strcspn(todo_list[todo_count].name, "\n")] = 0;
- 
-  printf("Enter priority:\n");
-  printf("0: LOW:\n");
-  printf("1: MEDIUM:\n");
-  printf("2: HIGH:\n");
 
-  scanf("%d", &priority_input);
 
-  todo_list[todo_count].priority = (Priority) priority_input;
+    while (true) {
+    printf("Enter priority:\n");
+    printf("0: LOW\n");
+    printf("1: MEDIUM\n");
+    printf("2: HIGH\n");
+    scanf("%d", &priority_input);
+    
+    if (priority_input >= 0 && priority_input <= 2) {
+        break;
+    }
+    printf("Invalid priority. Enter 0, 1, or 2.\n");
+}
+
+todo_list[todo_count].priority = (Priority)priority_input;
+  char temp_deadline[20];
+
+  getchar(); // this clears new line
+  while (true){
 
   printf("Enter deadline(Format: mm-dd-yyyy):\n");
-  getchar(); // this clears new line
-  fgets(todo_list[todo_count].deadline,100,stdin);
-  todo_list[todo_count].deadline[strcspn(todo_list[todo_count].deadline, "\n")] = 0;
+  
+  fgets(temp_deadline,20,stdin);
+
+  temp_deadline[strcspn(temp_deadline, "\n")] = 0;
+    if (isValidDeadline(temp_deadline) == 1){
+        break;
+    }
+    else{
+        printf("Invalid Date. Try again \n");
+    }
+  }
+    strcpy(todo_list[todo_count].deadline, temp_deadline);
 
 
 
