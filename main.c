@@ -39,6 +39,25 @@ int todo_count = 0;
 int todo_capacity = 0; 
 int next_id = 1;
 
+void saveToFile() {
+    FILE *file = fopen("database.txt", "w");  // "w" wipes and rewrites
+    if (file == NULL) {
+        printf("Error saving\n");
+        return;
+    }
+    for (int i = 0; i < todo_count; i++) {
+        fprintf(file, "%d | %s | %d | %d | %s | %s | %s\n",
+            todo_list[i].id,
+            todo_list[i].name,
+            todo_list[i].priority,
+            todo_list[i].categories,
+            todo_list[i].completed ? "Completed" : "Incomplete",
+            todo_list[i].deadline,
+            todo_list[i].timestamp);
+    }
+    fclose(file);
+}
+
 //Auto Set High Priority
 void autoSetHighPriority() {
   time_t now = time(NULL); //get today's date
@@ -121,7 +140,6 @@ while (fgets(line, sizeof(line), file) != NULL && todo_count < MAX) {
     todo_list[todo_count].priority = priority_temp;
     todo_list[todo_count].categories = category_temp;
     todo_count++;
-    todo_capacity++;
     next_id++;
 }
 
@@ -257,13 +275,14 @@ todo_list[todo_count].priority = (Priority)priority_input;
   todo_list[todo_count].id = next_id;
   todo_list[todo_count].completed = false; 
 
-  add_task(&todo_list[todo_count]);
 
   
   completed[count] = 0;
   count++;
   todo_count++;
   next_id++;
+
+  saveToFile();
   printf("Task added!\n");
 }
 
@@ -276,52 +295,197 @@ todo_list[todo_count].priority = (Priority)priority_input;
 void removeTask() {
   int index;
   
-  printf("Enter task number to remove: ");
+
+      for(int i = 0; i < todo_count; i++) {
+    if(strcmp(todo_list[i].name, "") !=0) {
+      printf("%d: %s | %s | %s | [%s] | %s | %s\n",
+        i,
+        todo_list[i].name,
+        priority_to_string(todo_list[i].priority),
+        category_to_string(todo_list[i].categories),
+        todo_list[i].completed ? "Completed" : "Incomplete",
+        todo_list[i].timestamp,
+        todo_list[i].deadline
+    );
+        
+        }
+      }
+
+  printf("Enter task number to remove:");
   scanf("%d", &index);
   
-  if(index < 0 || index >= count) {
+  if(index < 0 || index >= todo_count) {
     printf("Invalid task number.\n");
     return;
   }
   
-  strcpy(tasks[index], ""); // this marks as deleted
+
+    for (int i = index; i < todo_count - 1; i++) {
+        todo_list[i] = todo_list[i + 1];  // shift left
+    }
+    todo_count--;  // shrink the count
   printf("Task Removed Successfully.\n");
+  saveToFile();
 }
 
 //update task
 void updateTask() {
   int index;
   
+
+      for(int i = 0; i < todo_count; i++) {
+    if(strcmp(todo_list[i].name, "") !=0) {
+      printf("%d: %s | %s | %s | [%s] | %s | %s\n",
+        i,
+        todo_list[i].name,
+        priority_to_string(todo_list[i].priority),
+        category_to_string(todo_list[i].categories),
+        todo_list[i].completed ? "Completed" : "Needs to be done",
+        todo_list[i].timestamp,
+        todo_list[i].deadline
+    );
+        
+        }
+      }
+
+ 
   printf("Enter task number to update: ");
   scanf("%d", &index);
   
-  if(index < 0 || index >= count) {
+  if(index < 0 || index >= todo_count) {
     printf("Invalid task number.\n");
     return;
   }
+  int choice;
+
+int priority_input;
+
+  char temp_deadline[20];
+      int category_input;
+while (1) {
+
+    printf("\nWhat would you like to update \n");
+    printf("\n1. Name\n2. priority\n3. Category\n4. Deadline\n5. exit\n");
+    printf("Choose an option: ");
+     if (scanf("%d", &choice) != 1){
+
+            printf("Invalid Input Please enter a number. \n");
+            while (getchar() != '\n');
+            continue;
+
+        }
+    switch (choice) {
+      case 1:
+      printf("Enter New Name\n");
+        getchar(); // this clears new line
+    fgets(todo_list[index].name,100,stdin);
+    todo_list[index].name[strcspn(todo_list[index].name, "\n")] = 0;
+        saveToFile();
+    return;
+      case 2: 
+
+    while (true) {
+
+      printf("Enter New Priority\n");
+    printf("0: LOW\n");
+    printf("1: MEDIUM\n");
+    printf("2: HIGH\n");
+    scanf("%d", &priority_input);
+    
+    if (priority_input >= 0 && priority_input <= 2) {
+        break;
+    }
+    printf("Invalid priority. Enter 0, 1, or 2.\n");
+}
+
+todo_list[index].priority = (Priority)priority_input;
+
+saveToFile();
+     return; 
+      case 3: 
+      
+    while (true) {
+
+    printf("Enter New Category\n");
+  printf("0: School:\n");
+  printf("1: Work:\n");
+  printf("2: Life:\n");
+  printf("3: General:\n");
+  scanf("%d", &category_input);
+
+    if (category_input >= 0 && category_input <= 3) {
+        break;
+    }
+    printf("Invalid category. Enter 0, 1, 2, or 3.\n");
+    }
+  todo_list[index].categories = (Categories) category_input;
+
+
+saveToFile();
+return;
+
+      case 4: 
+      
+
+
+  while (true){
+
+  printf("Enter deadline(Format: mm-dd-yyyy):\n");
   
-  printf("Enter updated task: ");
-  getchar(); //clear for new line
-  fgets(tasks[index], 100, stdin);
-  
-  tasks[index][strcspn(tasks[index], "\n")] = 0;
-  
-  printf("Task Updated.\n");
+  fgets(temp_deadline,20,stdin);
+
+  temp_deadline[strcspn(temp_deadline, "\n")] = 0;
+    if (isValidDeadline(temp_deadline) == 1){
+        break;
+    }
+    else{
+        printf("Invalid Date. Try again \n");
+    }
+  }
+    strcpy(todo_list[todo_count].deadline, temp_deadline);
+
+
+
+saveToFile();
+      return;
+      case 5:  break;
+      default: printf("Invalid choice.\n");
+
+    }
+
+  }
+
 }
 
 //mark complete
 void markComplete() {
   int index;
   
+
+      for(int i = 0; i < todo_count; i++) {
+    if(strcmp(todo_list[i].name, "") !=0) {
+      printf("%d: %s | %s | %s | [%s] | %s | %s\n",
+        i,
+        todo_list[i].name,
+        priority_to_string(todo_list[i].priority),
+        category_to_string(todo_list[i].categories),
+        todo_list[i].completed ? "Completed" : "Needs to be done",
+        todo_list[i].timestamp,
+        todo_list[i].deadline
+    );
+        
+        }
+      }
   printf("Enter task number to mark complete: ");
   scanf("%d", &index);
   
-  if(index <0 || index >= count) {
+  if(index <0 || index >= todo_count) {
     printf("Invalid task number.\n");
     return;
   }
   
-  completed[index] = 1;
+  todo_list[index].completed = true;
+  saveToFile();
   printf("Task marked as complete.\n");
 }
 
@@ -444,7 +608,7 @@ int main() {
       case 4: markComplete(); break;
       case 5: displayTask(); break;
       case 6: compareDates(); break;
-      case 7: printf("Goodbye!\n"); return 0;
+      case 7: free_todo_list(); return 0;
       default: printf("Invalid choice.\n");
     }
   }
