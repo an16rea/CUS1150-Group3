@@ -6,31 +6,10 @@
 #include "functions/add_task.h"
 
 
-// #include "functions/read_tasks.h"
-
-// • Function for time stamps
-// • Function for priority level of tasks
-// • Function to display date task was added
-// • Function to display when tasks completed by
-// • Function to save data to a file
-// • Function to read data from a file
-// • Function to display name of tasks
-// • Function to list tasks
-// • Function to create, remove, update tasks
-// • Function to mark when tasks are completed
-// • Function to create di_erent lists. ex : school , work, etc..
-// • Function to return the next task to do across all to-do lists based on the closest deadline
-// • Function to auto mark a task on a list as high priority on the day before if its not done before
 
 #define INITIAL_capcaity 10
 #define MAX 100
 
-// typedef struct {
-//     int id;
-//     char name[30];
-//     bool completed;
-
-// } TodoItem; 
 
 
 TodoItem* todo_list = NULL; 
@@ -617,59 +596,3 @@ int main() {
       
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// int main(void){
-//     int choice = 0;
-//     while(true) {
-//         printf("\n-------------To Do App-------------\n");
-//         printf("Enter 1 to add task\n");
-//         printf("Enter 2 to delete task\n");
-//         printf("Enter 3 to update task\n");
-//         printf("Enter 4 to view tasks\n");
-//         printf("Enter 5 to view highest priority task\n");
-//         printf("Enter 6 to quit:\n");
-//         printf("Enter a number:");
-//         if (scanf("%d", &choice) != 1){
-
-//             printf("Invalid Input Please enter a number. \n");
-//             while (getchar() != '\n');
-//             continue;
-
-//         }
-//         while (getchar() != '\n'); 
-
-//         if (choice == 6 ) break;
-//         switch(choice){
-//             case 1:
-//             add_task();
-//             break;
-//             case 4:
-//             read_tasks();
-//             break;
-//             default: 
-//             printf("Invalid choice please try again");
-//         }
-//     }
-
-//     return 0;
-// }
